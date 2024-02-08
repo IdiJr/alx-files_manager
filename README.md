@@ -1,6 +1,7 @@
 # 0x04. Files manager
 
-![]()
+![](https://d585tldpucybw.cloudfront.net/sfimages/default-source/2017-06/telerik-ui-for-blazor-filemanager-component-.png?sfvrsn=4a67a9_1)
+![](https://d585tldpucybw.cloudfront.net/sfimages/default-source/10x/telerik-ui-for-blazor-filemanager-expose-selected-items.gif?sfvrsn=319e4e24_1)
 
 This project is a summary of this back-end trimester: `authentication`, `NodeJS`, `MongoDB`, `Redis`, `pagination` and `background processing`.
 The objective is to build a simple platform to upload and view files:
