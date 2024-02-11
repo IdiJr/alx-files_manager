@@ -2,7 +2,7 @@
 import { MongoClient } from 'mongodb';
 
 class DBClient {
-  constructor () {
+  constructor() {
     const HOST = process.env.DB_HOST || 'localhost';
     const PORT = process.env.DB_PORT || 27017;
     const DATABASE = process.env.DB_DATABASE || 'files_manager';
@@ -16,11 +16,11 @@ class DBClient {
     });
   }
 
-  isAlive () {
+  isAlive() {
     return this.client.isConnected();
   }
 
-  async nbUsers () {
+  async nbUsers() {
     try {
       const db = this.client.db();
       const usersCollection = db.collection('users');
@@ -32,7 +32,7 @@ class DBClient {
     }
   }
 
-  async nbFiles () {
+  async nbFiles() {
     try {
       const db = this.client.db();
       const filesCollection = db.collection('files');
