@@ -1,4 +1,5 @@
 import redis from 'redis';
+import { promisify } from 'util';
 
 // class to define methods for commonly used redis commands
 class RedisClient {
@@ -19,43 +20,24 @@ class RedisClient {
 
   // get value for given key from redis server
   async get (key) {
-    return new Promise((resolve, reject) => {
-      this.client.get(key, (error, value) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(value);
-        }
-      });
-    });
+    const redisGet = promisify(this.client.get).bind(this.client);
+    await redisGet(key);
+    return await redisGet(key);
   }
 
   // set key value pair to redis server
   async set (key, value, durationInSeconds) {
-    return new Promise((resolve, reject) => {
-      this.client.setex(key, durationInSeconds, value, (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    const redisSet = promisify(this.client.set).bind(this.client);
+    await redisSet(key, value);
+    await this.client.expire(key, durationInSeconds);
   }
 
   // del key vale pair from redis server
   async del (key) {
-    return new Promise((resolve, reject) => {
-      this.client.del(key, (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    const redisdel = promisify(this.client.del).bind(this.client);
+    await redisdel(key);
   }
 }
 
 const redisClient = new RedisClient();
-export default redisClient;
+module.exports = redisClient;
