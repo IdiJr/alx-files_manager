@@ -1,13 +1,13 @@
-import dbClient from '../utils/db.js';
-import redisClient from '../utils/redis.js';
 import { hash } from 'bcrypt';
 import { Queue } from 'bull';
 import { v4 as uuidv4 } from 'uuid';
+import redisClient from '../utils/redis';
+import dbClient from '../utils/db';
 
 const userQueue = new Queue('userQueue');
 
 const UsersController = {
-  async postNew (req, res) {
+  async postNew(req, res) {
     const { email, password } = req.body;
 
     if (!email) {
@@ -27,14 +27,14 @@ const UsersController = {
     const newUser = {
       email,
       password: hashedPassword,
-      id: uuidv4()
+      id: uuidv4(),
     };
 
     const savedUser = await dbClient.createUser(newUser);
     return res.status(201).json({ id: savedUser.id, email: savedUser.email });
   },
 
-  async getMe (req, res) {
+  async getMe(req, res) {
     const { 'x-token': token } = req.headers;
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
