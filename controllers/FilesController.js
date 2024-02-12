@@ -4,7 +4,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 const FilesController = {
-  async postUpload(req, res) {
+  async postUpload (req, res) {
     const { 'x-token': token } = req.headers;
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -49,11 +49,11 @@ const FilesController = {
       type,
       parentId,
       isPublic,
-      localPath,
+      localPath
     });
 
     return res.status(201).json(newFile);
-  },
+  }
 };
 
 export default FilesController;
