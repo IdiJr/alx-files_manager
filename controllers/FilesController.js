@@ -2,7 +2,12 @@ import redisClient from '../utils/redis.js';
 import dbClient from '../utils/db.js';
 import fs from 'fs';
 import mime from 'mime-types';
+import { Queue } from 'bull';
+import { generate } from 'image-thumbnail';
+
 import { v4 as uuidv4 } from 'uuid';
+
+const fileQueue = new Queue('fileQueue');
 
 const FilesController = {
   async postUpload (req, res) {
@@ -164,6 +169,77 @@ const FilesController = {
 
     const contentType = mime.lookup(file.name) || 'application/octet-stream';
     const fileContent = fs.readFileSync(file.localPath, 'utf-8');
+
+    res.setHeader('Content-Type', contentType);
+    res.send(fileContent);
+  },
+
+  async postUpload (req, res) {
+    // Existing implementation...
+
+    // Start background processing for generating thumbnails
+    if (type === 'image') {
+      fileQueue.add({ userId, fileId });
+    }
+
+    return res.status(201).json(newFile);
+  },
+
+  // New method to handle thumbnail generation
+  async generateThumbnails (job) {
+    const { fileId, userId } = job.data;
+
+    if (!fileId) {
+      throw new Error('Missing fileId');
+    }
+
+    if (!userId) {
+      throw new Error('Missing userId');
+    }
+
+    const file = await dbClient.getFile(fileId);
+    if (!file || file.userId !== userId) {
+      throw new Error('File not found');
+    }
+
+    const localPath = file.localPath;
+    if (!fs.existsSync(localPath)) {
+      throw new Error('File not found');
+    }
+
+    try {
+      await generate({
+        source: localPath,
+        destination: localPath,
+        width: 500
+      });
+      await generate({
+        source: localPath,
+        destination: localPath,
+        width: 250
+      });
+      await generate({
+        source: localPath,
+        destination: localPath,
+        width: 100
+      });
+    } catch (error) {
+      console.error('Thumbnail generation error:', error);
+    }
+  },
+
+  async getFile (req, res) {
+    // Existing implementation...
+
+    const { size } = req.query;
+    const localFilePath = `${file.localPath}_${size}`;
+
+    if (!fs.existsSync(localFilePath)) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    const contentType = mime.lookup(localFilePath) || 'application/octet-stream';
+    const fileContent = fs.readFileSync(localFilePath, 'utf-8');
 
     res.setHeader('Content-Type', contentType);
     res.send(fileContent);
