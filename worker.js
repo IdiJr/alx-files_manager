@@ -1,8 +1,19 @@
 import { Queue } from 'bull';
-import { generateThumbnails } from './controllers/FilesController.js';
+import dbClient from './utils/db.js';
 
 const fileQueue = new Queue('fileQueue');
 
-fileQueue.process(async (job) => {
-  await generateThumbnails(job);
+userQueue.process(async (job) => {
+  const { userId } = job.data;
+
+  if (!userId) {
+    throw new Error('Missing userId');
+  }
+  const user = await dbClient.getUserById(userId);
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  console.log(`Welcome ${user.email}!`);
 });

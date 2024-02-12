@@ -1,7 +1,10 @@
 import dbClient from '../utils/db.js';
 import redisClient from '../utils/redis.js';
 import { hash } from 'bcrypt';
+import { Queue } from 'bull';
 import { v4 as uuidv4 } from 'uuid';
+
+const userQueue = new Queue('userQueue');
 
 const UsersController = {
   async postNew (req, res) {
@@ -48,7 +51,21 @@ const UsersController = {
     }
 
     return res.status(200).json({ id: user._id, email: user.email });
-  }
+  },
+
+  async postUser(req, res) {
+    try {
+      const userData = req.body;
+
+      const newUser = await dbClient.createUser(userData);
+
+      userQueue.add({ userId: newUser.id });
+
+      return res.status(201).json(newUser);
+    } catch (error) {
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
 };
 
 export default UsersController;
