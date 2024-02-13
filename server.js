@@ -3,15 +3,14 @@
 */
 
 import express from 'express';
-import router from './routes/index';
+import routes from './routes/index';
 
 const port = process.env.PORT || 5000;
 
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded());
-app.use(router);
+app.use('/api', routes);
 
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
