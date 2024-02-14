@@ -1,5 +1,6 @@
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 const UsersController = {
   async postNew(req, res) {
@@ -13,9 +14,17 @@ const UsersController = {
       return res.status(400).json({ error: 'Missing password' });
     }
 
-    // Check if the email already exists in the database
+    // Check if the email already exists in the Redis cache
+    const emailExistsInCache = await redisClient.get(email);
+    if (emailExistsInCache) {
+      return res.status(400).json({ error: 'Already exist' });
+    }
+
+    // Check if the email already exists in the MongoDB database
     const existingUser = await dbClient.client.db().collection('users').findOne({ email });
     if (existingUser) {
+      // Cache the email to Redis to avoid duplicate registrations
+      await redisClient.set(email, 'true', 60); // 60 seconds cache
       return res.status(400).json({ error: 'Already exist' });
     }
 
