@@ -1,3 +1,6 @@
+/**
+ * File that connects DB
+ */
 import { MongoClient } from 'mongodb';
 
 const HOST = process.env.DB_HOST || 'localhost';
