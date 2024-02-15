@@ -1,3 +1,7 @@
+/**
+ * index for routes
+ */
+//imports
 import { Router } from 'express';
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
@@ -6,6 +10,7 @@ import FilesController from '../controllers/FilesController';
 
 const router = Router();
 
+//Routes
 router.get('/status', AppController.getStatus);
 
 router.get('/stats', AppController.getStats);
